@@ -2,11 +2,11 @@ require("dotenv").config();
 
 const generateCode = (value) => {
   let output = "";
-  value=value
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .split(" ")
-      .join("");
+  value = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .split(" ")
+    .join("");
   let merge = value + process.env.phongtro123;
   let length = merge.length;
   for (let i = 0; i < 3; i++) {
@@ -17,7 +17,7 @@ const generateCode = (value) => {
     output += merge.charAt(index);
     length = index;
   }
-  return `${value.charAt(0)}${output}`.toUpperCase();
+  return `${value.charAt(2)}${output}`.toUpperCase();
 };
 
 export default generateCode;

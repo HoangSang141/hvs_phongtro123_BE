@@ -5,10 +5,13 @@ import chothuecanho from "../../data/chothuecanho.json";
 import chothuephongtro from "../../data/chothuephongtro.json";
 import matbang from "../../data/matbang.json";
 import nhachothue from "../../data/nhachothue.json";
-import generateCode from "../../ultis/generateCode";
+import generateCode from "../ultis/generateCode";
+import { dataPrice } from "../ultis/data";
+import { dataArea } from "../ultis/data";
+import { getNumberFromString } from "../ultis/common";
 require("dotenv").config();
 
-const dataBody = chothuephongtro.body;
+const dataBody = nhachothue.body;
 
 const hashPassword = (password) =>
   bcrypt.hashSync(password, bcrypt.genSaltSync(12));
@@ -26,6 +29,11 @@ export const insertService = () =>
         let userId = v4();
         let imagesId = v4();
         let overviewId = v4();
+        let desc = JSON.stringify(item?.mainContent?.content);
+        let currentArea = getNumberFromString(
+          item?.header?.attributes?.acreage
+        );
+        let currentPrice = getNumberFromString(item?.header?.attributes?.price);
         await db.Post.create({
           id: postId,
           title: item?.header?.title,
@@ -33,13 +41,20 @@ export const insertService = () =>
           labelCode,
           address: item?.header?.address,
           attributesId,
-          categoryCode: "CTPT",
-          description: JSON.stringify(item?.mainContent?.content),
+          categoryCode: "NCT",
+          description: desc,
           userId,
           price: item?.header?.attributes?.price,
           overviewId,
           imagesId,
+          areaCode: dataArea.find(
+            (area) => area.max >= currentArea && area.min <= currentArea
+          )?.code,
+          priceCode: dataPrice.find(
+            (area) => area.max >= currentPrice && area.min <= currentPrice
+          )?.code,
         });
+
         await db.Attribute.create({
           id: attributesId,
           price: item?.header?.attributes?.price,
@@ -94,5 +109,29 @@ export const insertService = () =>
       resolve("Done.");
     } catch (error) {
       reject(error);
+    }
+  });
+
+export const createPricesAndAreas = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      dataPrice.forEach(async (item, index) => {
+        await db.Price.create({
+          code: item.code,
+          value: item.value,
+          order: index + 1,
+        });
+      });
+      dataArea.forEach(async (item, index) => {
+        await db.Area.create({
+          code: item.code,
+          value: item.value,
+          order: index + 1,
+        });
+      });
+
+      resolve("OK");
+    } catch (err) {
+      reject(err);
     }
   });
