@@ -1,4 +1,5 @@
 import db from "../models";
+const { Op } = require("sequelize");
 
 export const getPostsService = () =>
   new Promise(async (relsove, reject) => {
@@ -27,12 +28,19 @@ export const getPostsService = () =>
     }
   });
 
-export const getPostsLimitService = (page, query) =>
+export const getPostsLimitService = (
+  page,
+  query,
+  { priceNumber, areaNumber }
+) =>
   new Promise(async (relsove, reject) => {
     try {
-      let offset = (!page || +page <= 1) ? 0 : (+page - 1);
+      let offset = !page || +page <= 1 ? 0 : +page - 1;
+      const queries = { ...query };
+      if (priceNumber) queries.priceNumber = { [Op.between]: priceNumber };
+      if (areaNumber) queries.areaNumber = { [Op.between]: areaNumber };
       const response = await db.Post.findAndCountAll({
-        where: query,
+        where: queries,
         raw: true,
         nest: true,
         offset: offset * +process.env.LIMIT,
@@ -47,6 +55,35 @@ export const getPostsLimitService = (page, query) =>
           { model: db.User, as: "user", attributes: ["name", "zalo", "phone"] },
         ],
         attributes: ["id", "title", "star", "address", "description"],
+      });
+      relsove({
+        err: response ? 0 : 1,
+        msg: response ? "OK" : "Getting posts is failed.",
+        response,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const getNewPostService = () =>
+  new Promise(async (relsove, reject) => {
+    try {
+      const response = await db.Post.findAll({
+        raw: true,
+        nest: true,
+        order: [["createdAt", "DESC"]],
+        offset: 0,
+        limit: +process.env.LIMIT,
+        include: [
+          { model: db.Image, as: "images", attributes: ["image"] },
+          {
+            model: db.Attribute,
+            as: "attributes",
+            attributes: ["price", "acreage", "published", "hashtag"],
+          },
+        ],
+        attributes: ["id", "title", "star", "createdAt"],
       });
       relsove({
         err: response ? 0 : 1,
