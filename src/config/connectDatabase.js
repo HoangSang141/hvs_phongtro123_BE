@@ -7,7 +7,7 @@ const sequelize = new Sequelize("phongtro123", "root", null, {
   logging: false
 });
 
-const connectDadabase = async () => {
+const connectDatabase = async () => {
   try {
     await sequelize.authenticate();
     console.log("Connection has been established successfully.");
@@ -15,4 +15,4 @@ const connectDadabase = async () => {
     console.error("Unable to connect to the database:", error);
   }
 };
-export default connectDadabase;
+export default connectDatabase;

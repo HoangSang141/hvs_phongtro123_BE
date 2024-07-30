@@ -26,7 +26,7 @@ module.exports = {
       created: {
         type: Sequelize.STRING,
       },
-      expire: {
+      expired: {
         type: Sequelize.STRING,
       },
       createdAt: {
