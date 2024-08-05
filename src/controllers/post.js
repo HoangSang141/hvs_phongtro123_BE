@@ -102,7 +102,7 @@ export const updatePost = async (req, res) => {
 };
 
 export const deletePost = async (req, res) => {
-  const { postId} = req.body;
+  const { postId } = req.query;
   const { id } = req.user;
   try {
     if (!postId || !id)
@@ -119,4 +119,3 @@ export const deletePost = async (req, res) => {
     });
   }
 };
-

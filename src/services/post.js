@@ -61,6 +61,7 @@ export const getPostsLimitService = (
           },
           { model: db.User, as: "user", attributes: ["name", "zalo", "phone"] },
           { model: db.Overview, as: "overviews",attributes:['area', 'bonus', 'code', 'created','expired', 'target','type'] },
+          {model: db.Label, as:'labelData', attributes:{exclude:['createdAt', 'updatedAt']}},
         ],
         attributes: ["id", "title", "star", "address", "description"],
       });
